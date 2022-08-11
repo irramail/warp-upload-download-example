@@ -1,7 +1,7 @@
 use bytes::BufMut;
 use futures::TryStreamExt;
 use std::convert::Infallible;
-use uuid::Uuid;
+//use uuid::Uuid;
 use warp::{
     http::StatusCode,
     multipart::{FormData, Part},
@@ -17,8 +17,8 @@ async fn main() {
     let download_route = warp::path("files").and(warp::fs::dir("./files/"));
 
     let router = upload_route.or(download_route).recover(handle_rejection);
-    println!("Server started at localhost:8080");
-    warp::serve(router).run(([0, 0, 0, 0], 8080)).await;
+    println!("Server started at localhost:8081");
+    warp::serve(router).run(([0, 0, 0, 0], 8081)).await;
 }
 
 async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
@@ -26,9 +26,11 @@ async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
         eprintln!("form error: {}", e);
         warp::reject::reject()
     })?;
-
+    let mut filename: String;
     for p in parts {
         if p.name() == "file" {
+            filename = p.filename().unwrap().to_string().clone();
+            /*
             let content_type = p.content_type();
             let file_ending;
             match content_type {
@@ -48,7 +50,9 @@ async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
                     eprintln!("file type could not be determined");
                     return Err(warp::reject::reject());
                 }
-            }
+            }*/
+
+
 
             let value = p
                 .stream()
@@ -61,13 +65,13 @@ async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
                     eprintln!("reading file error: {}", e);
                     warp::reject::reject()
                 })?;
-
-            let file_name = format!("./files/{}.{}", Uuid::new_v4().to_string(), file_ending);
+            //println!("{:?}", format!("./{}/{}", filename, filename));
+            let file_name = format!("./{}/{}", filename, filename);
             tokio::fs::write(&file_name, value).await.map_err(|e| {
                 eprint!("error writing file: {}", e);
                 warp::reject::reject()
             })?;
-            println!("created file: {}", file_name);
+            //println!("created file: {}", file_name);
         }
     }
 
