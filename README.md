@@ -17,3 +17,18 @@ curl --location --request POST 'http://localhost:8080/upload' \
 The file is saved using a random id as a name, with the extension. The name is logged, so you can see that it worked.
 
 The max file-size is configured at ~5 MB.
+
+# Uploader
+```sh
+#!/bin/sh
+uuid=`ssh backup 'uuid=$(uuidgen) && ln -s ~/projects/warp-upload-download-example/files ~/projects/warp-upload-download-example/"$uuid".png && echo "$uuid"'`
+
+#raspistill -o ./"$uuid".png
+cp ./test.png ./"$uuid".png
+
+curl --location --request POST 'http://api2.you-domain.net/upload' --header 'Content-Type: multipart/form-data' --form 'file=@./'"$uuid"'.png'
+
+rm ./"$uuid".png
+
+ssh backup 'unlink ~/projects/warp-upload-download-example/'"$uuid"'.png'
+```
