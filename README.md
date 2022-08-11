@@ -26,7 +26,7 @@ uuid=`ssh backup 'uuid=$(uuidgen) && ln -s ~/projects/warp-upload-download-examp
 #raspistill -o ./"$uuid".png
 cp ./test.png ./"$uuid".png
 
-curl --location --request POST 'http://api2.you-domain.net/upload' --header 'Content-Type: multipart/form-data' --form 'file=@./'"$uuid"'.png'
+curl --location --request POST 'http://api2.your-domain.net/upload' --header 'Content-Type: multipart/form-data' --form 'file=@./'"$uuid"'.png'
 
 rm ./"$uuid".png
 
